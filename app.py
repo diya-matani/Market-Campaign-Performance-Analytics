@@ -1,0 +1,301 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from scipy.stats import chi2_contingency, ttest_ind
+
+# Set page config
+st.set_page_config(page_title="Marketing Campaign Performance", layout="wide")
+
+# Custom CSS for better aesthetics
+st.markdown("""
+<style>
+    .metric-card {
+        background-color: #f0f2f6;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 10px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: #ffffff;
+        border-radius: 5px 5px 0 0;
+        gap: 1px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #e6f3ff;
+        border-bottom: 2px solid #4e8cff;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# Title and Intro
+st.title("Marketing Campaign Performance Analytics")
+st.markdown("### Analyzing the impact of email marketing strategies on conversion and spend.")
+st.markdown("---")
+
+# 1. Data Loading (Cached)
+@st.cache_data
+def load_data(file):
+    df = pd.read_csv(file)
+    return df
+
+# Sidebar Configuration
+with st.sidebar:
+    st.header("Configuration")
+    uploaded_file = st.file_uploader("Upload Dataset (CSV)", type="csv")
+    st.markdown("---")
+    st.markdown("**About this Dashboard**")
+    st.info("""
+    This dashboard analyzes a digital marketing campaign's performance.
+    
+    **Key Metrics:**
+    - Visit Rate
+    - Conversion Rate
+    - Average Spend
+    
+    **Segments Analyzed:**
+    - Apparel Email
+    - Footwear Email
+    - Control Group (No Email)
+    """)
+
+# Load Data
+default_file = "digital_marketing_dataset.csv"
+if uploaded_file is not None:
+    df = load_data(uploaded_file)
+    st.sidebar.success("Custom dataset loaded")
+else:
+    try:
+        df = load_data(default_file)
+        st.sidebar.success("Default dataset loaded")
+    except FileNotFoundError:
+        st.error(f"Default file '{default_file}' not found. Please upload a CSV file.")
+        st.stop()
+
+# --- PRE-CALCULATIONS ---
+metrics = df.groupby("campaign_segment").agg(
+    user_count=("campaign_segment", "count"),
+    visit_rate=("visit", "mean"),
+    conversion_count=("conversion", "sum"),
+    conversion_rate=("conversion", "mean"),
+    avg_spend=("spend", "mean")
+).reset_index()
+
+# Find winning campaign based on conversion
+winner = metrics.loc[metrics['conversion_rate'].idxmax()]
+
+# --- TABS LAYOUT ---
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "Executive Summary", 
+    "Data Overview", 
+    "Campaign Performance", 
+    "Statistical Tests", 
+    "Segmentation Deep Dive",
+    "Spend Profile"
+])
+
+# --- TAB 1: EXECUTIVE SUMMARY ---
+with tab1:
+    st.header("Executive Summary")
+    
+    col_a, col_b, col_c = st.columns(3)
+    with col_a:
+        st.metric(label="Total Users Targeted", value=f"{df.shape[0]:,}")
+    with col_b:
+        st.metric(label="Overall Conversion Rate", value=f"{df['conversion'].mean():.2%}")
+    with col_c:
+        st.metric(label="Avg Overall Spend", value=f"${df['spend'].mean():.2f}")
+
+    st.markdown("Winning Strategy")
+    st.success(f"**{winner['campaign_segment']}** is the top performing campaign with a conversion rate of **{winner['conversion_rate']:.2%}**.")
+    
+    st.markdown("""
+    #### Key Insights:
+    - **Apparel Email** drove the highest website visits and actual purchases.
+    - **Significance**: The performance gap between Apparel Email and the Control Group is statistically significant (confirmed by Chi-Square tests).
+    - **Recommendation**: Prioritize the Apparel Email strategy while investigating why Footwear underperformed relative to Apparel but still beat the baseline.
+    """)
+
+# --- TAB 2: DATA OVERVIEW ---
+with tab2:
+    st.header("Dataset Overview")
+    col1, col2 = st.columns([1, 2])
+    
+    with col1:
+        st.markdown("#### Dataset Statistics")
+        st.write(df.describe())
+        st.markdown("#### Missing Values")
+        st.write(df.isnull().sum())
+    
+    with col2:
+        st.markdown("#### Sample Data")
+        st.dataframe(df.head(10), use_container_width=True)
+        st.caption(f"Shape: {df.shape[0]} rows, {df.shape[1]} columns")
+
+# --- TAB 3: CAMPAIGN PERFORMANCE ---
+with tab3:
+    st.header("Campaign Performance Metrics")
+    st.markdown("Comparative analysis of Visit Rates, Conversion Rates, and Average Spend across groups.")
+
+    # Main Metrics Table
+    st.subheader("Summary Table")
+    st.dataframe(metrics.style.format({
+        "visit_rate": "{:.2%}",
+        "conversion_rate": "{:.2%}",
+        "avg_spend": "${:.2f}"
+    }), use_container_width=True)
+
+    # Visualizations
+    st.subheader("Visual Comparisons")
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    sns.barplot(data=metrics, x="campaign_segment", y="visit_rate", ax=axes[0], palette="viridis")
+    axes[0].set_title("Visit Rate", fontsize=14)
+    axes[0].set_ylabel("Rate")
+    axes[0].grid(axis='y', linestyle='--', alpha=0.5)
+
+    sns.barplot(data=metrics, x="campaign_segment", y="conversion_rate", ax=axes[1], palette="coolwarm")
+    axes[1].set_title("Conversion Rate", fontsize=14)
+    axes[1].set_ylabel("Rate")
+    axes[1].grid(axis='y', linestyle='--', alpha=0.5)
+
+    sns.barplot(data=metrics, x="campaign_segment", y="avg_spend", ax=axes[2], palette="magma")
+    axes[2].set_title("Average Spend ($)", fontsize=14)
+    axes[2].set_ylabel("Dollars")
+    axes[2].grid(axis='y', linestyle='--', alpha=0.5)
+
+    st.pyplot(fig)
+    st.caption("Bar charts showing key performance indicators by campaign segment.")
+
+# --- TAB 4: STATISTICAL SIGNIFICANCE ---
+with tab4:
+    st.header("Statistical Significance Testing")
+    st.markdown("""
+    We use **Chi-Square Tests** to determine if the differences in visit and conversion rates are statistically significant, 
+    and **T-Tests** for spending differences.
+    
+    - **Null Hypothesis (H0)**: There is no difference between the groups.
+    - **P-Value < 0.05**: We reject H0 → The difference is **Significant**.
+    """)
+
+    # --- Calculations ---
+    footwear = df[df["campaign_segment"] == "Footwear E-Mail"]
+    apparel = df[df["campaign_segment"] == "Apparel E-Mail"]
+    no_email = df[df["campaign_segment"] == "No E-Mail"]
+
+    def run_chi2(group1, group2, metric="visit"):
+        contingency = [
+            [group1[metric].sum(), group1.shape[0] - group1[metric].sum()],
+            [group2[metric].sum(), group2.shape[0] - group2[metric].sum()]
+        ]
+        stat, p, _, _ = chi2_contingency(contingency)
+        return p
+
+    comparisons = [
+        ("Apparel", "Footwear", apparel, footwear),
+        ("Apparel", "No Email", apparel, no_email),
+        ("Footwear", "No Email", footwear, no_email)
+    ]
+    
+    results = []
+    for label1, label2, g1, g2 in comparisons:
+        p_visit = run_chi2(g1, g2, "visit")
+        p_conv = run_chi2(g1, g2, "conversion")
+        t_stat, p_spend = ttest_ind(g1["spend"], g2["spend"], nan_policy='omit')
+        
+        results.append({
+            "Comparison": f"{label1} vs {label2}",
+            "Visit Rate P-Value": p_visit,
+            "Conversion Rate P-Value": p_conv,
+            "Spend P-Value": p_spend
+        })
+    
+    results_df = pd.DataFrame(results)
+
+    def highlight_significant(val):
+        if isinstance(val, float):
+            color = '#d4edda' if val < 0.05 else '#f8d7da' # Green if sig, Red/Pink if not
+            return f'background-color: {color}'
+        return ''
+
+    st.subheader("Test Results")
+    st.dataframe(
+        results_df.style
+        .applymap(highlight_significant, subset=["Visit Rate P-Value", "Conversion Rate P-Value", "Spend P-Value"])
+        .format("{:.4f}", subset=["Visit Rate P-Value", "Conversion Rate P-Value", "Spend P-Value"]),
+        use_container_width=True
+    )
+    
+    st.info("**Interpretation**: Green cells (p < 0.05) indicate that the marketing campaign had a real, non-random impact compared to the other group.")
+
+# --- TAB 5: SEGMENTATION ---
+with tab5:
+    st.header("Segmentation Analysis")
+    st.markdown("Analyze how different customer groups reacted to the campaigns.")
+
+    col1, col2 = st.columns([1, 3])
+    with col1:
+        segment_col = st.selectbox("Select Segment Attribute", 
+                                   ["acquired_in_last_year", "address_category", "history_footwear", "history_apparel"],
+                                   format_func=lambda x: x.replace("_", " ").title())
+        
+        st.markdown("**Attribute Description:**")
+        if segment_col == "acquired_in_last_year":
+            st.write("0: Existing Customer\n1: New Customer")
+        elif segment_col == "history_footwear":
+            st.write("0: Never bought footwear\n1: Bought footwear before")
+
+    with col2:
+        segment_metrics = df.groupby(["campaign_segment", segment_col]).agg(
+            conversion_rate=("conversion", "mean"),
+            avg_spend=("spend", "mean")
+        ).reset_index()
+
+        fig2, ax2 = plt.subplots(1, 2, figsize=(14, 5))
+        
+        sns.barplot(data=segment_metrics, x=segment_col, y="conversion_rate", hue="campaign_segment", ax=ax2[0], palette="cividis")
+        ax2[0].set_title(f"Conversion Rate by {segment_col.replace('_', ' ').title()}")
+        
+        sns.barplot(data=segment_metrics, x=segment_col, y="avg_spend", hue="campaign_segment", ax=ax2[1], palette="magma")
+        ax2[1].set_title(f"Avg Spend by {segment_col.replace('_', ' ').title()}")
+        
+        st.pyplot(fig2)
+
+# --- TAB 6: CUSTOMER PROFILING ---
+with tab6:
+    st.header("Customer Spend Profiling")
+    st.markdown("Breakdown of performance based on historical customer value (High/Medium/Low spenders).")
+
+    try:
+        # Dynamic binning based on quartiles/distribution
+        df['spend_group'] = pd.qcut(df['history_spend'], q=3, labels=['Low Value', 'Medium Value', 'High Value'])
+        
+        spend_metrics = df.groupby(['campaign_segment', 'spend_group']).agg(
+            conversion_rate=('conversion', 'mean')
+        ).reset_index()
+
+        fig3, ax3 = plt.subplots(figsize=(12, 6))
+        sns.barplot(data=spend_metrics, x='spend_group', y='conversion_rate', hue='campaign_segment', palette='coolwarm', ax=ax3)
+        ax3.set_title("Conversion Rate by Historical Spend Level", fontsize=15)
+        ax3.set_ylabel("Conversion Rate")
+        ax3.set_xlabel("Customer Value Tier")
+        
+        st.pyplot(fig3)
+        
+        st.markdown("""
+        **Insight**: This chart reveals if we are effectively upselling high-value customers or activating low-value ones.
+        """)
+
+    except Exception as e:
+        st.error(f"Error in profiling analysis: {e}")
