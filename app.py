@@ -12,12 +12,12 @@ st.set_page_config(page_title="Marketing Campaign Performance", layout="wide")
 st.markdown("""
 <style>
     .metric-card {
-        background-color: #262730;
+        background-color: var(--secondary-background-color);
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
         text-align: center;
-        border: 1px solid #464b5c;
+        border: 1px solid var(--text-color);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -142,21 +142,25 @@ with tab3:
     # Visualizations
     st.subheader("Visual Comparisons")
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+    fig.patch.set_facecolor('none')
 
     sns.barplot(data=metrics, x="campaign_segment", y="visit_rate", ax=axes[0], palette="viridis")
     axes[0].set_title("Visit Rate", fontsize=14)
     axes[0].set_ylabel("Rate")
     axes[0].grid(axis='y', linestyle='--', alpha=0.5)
+    axes[0].set_facecolor('none')
 
     sns.barplot(data=metrics, x="campaign_segment", y="conversion_rate", ax=axes[1], palette="coolwarm")
     axes[1].set_title("Conversion Rate", fontsize=14)
     axes[1].set_ylabel("Rate")
     axes[1].grid(axis='y', linestyle='--', alpha=0.5)
+    axes[1].set_facecolor('none')
 
     sns.barplot(data=metrics, x="campaign_segment", y="avg_spend", ax=axes[2], palette="magma")
     axes[2].set_title("Average Spend ($)", fontsize=14)
     axes[2].set_ylabel("Dollars")
     axes[2].grid(axis='y', linestyle='--', alpha=0.5)
+    axes[2].set_facecolor('none')
 
     st.pyplot(fig)
     st.caption("Bar charts showing key performance indicators by campaign segment.")
@@ -246,12 +250,15 @@ with tab5:
         ).reset_index()
 
         fig2, ax2 = plt.subplots(1, 2, figsize=(14, 5))
+        fig2.patch.set_facecolor('none')
         
         sns.barplot(data=segment_metrics, x=segment_col, y="conversion_rate", hue="campaign_segment", ax=ax2[0], palette="cividis")
         ax2[0].set_title(f"Conversion Rate by {segment_col.replace('_', ' ').title()}")
+        ax2[0].set_facecolor('none')
         
         sns.barplot(data=segment_metrics, x=segment_col, y="avg_spend", hue="campaign_segment", ax=ax2[1], palette="magma")
         ax2[1].set_title(f"Avg Spend by {segment_col.replace('_', ' ').title()}")
+        ax2[1].set_facecolor('none')
         
         st.pyplot(fig2)
 
@@ -269,10 +276,12 @@ with tab6:
         ).reset_index()
 
         fig3, ax3 = plt.subplots(figsize=(12, 6))
+        fig3.patch.set_facecolor('none')
         sns.barplot(data=spend_metrics, x='spend_group', y='conversion_rate', hue='campaign_segment', palette='coolwarm', ax=ax3)
         ax3.set_title("Conversion Rate by Historical Spend Level", fontsize=15)
         ax3.set_ylabel("Conversion Rate")
         ax3.set_xlabel("Customer Value Tier")
+        ax3.set_facecolor('none')
         
         st.pyplot(fig3)
         
