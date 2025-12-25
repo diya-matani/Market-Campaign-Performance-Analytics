@@ -63,13 +63,13 @@ themes = {
         }
         /* Specific Fix for File Uploader in Light Mode */
         [data-testid="stFileUploader"] section {
-            background-color: #f0f2f6 !important; /* Light gray background for drop zone */
+            background-color: #f0f2f6 !important;
             color: #262730 !important;
         }
-        [data-testid="stFileUploader"] section > button {
-             background-color: #ffffff !important;
-             color: #262730 !important;
-             border: 1px solid #d3d3d3 !important;
+        [data-testid="stFileUploader"] button {
+             background-color: #4e8cff !important; /* Primary color for button */
+             color: #ffffff !important;
+             border: none !important;
         }
         </style>
     """,
@@ -109,10 +109,10 @@ themes = {
             background-color: #262730 !important;
             color: #fafafa !important;
         }
-        [data-testid="stFileUploader"] section > button {
-             background-color: #0e1117 !important;
-             color: #fafafa !important;
-             border: 1px solid #464b5c !important;
+        [data-testid="stFileUploader"] button {
+             background-color: #4e8cff !important; /* Primary color for button */
+             color: #ffffff !important;
+             border: none !important;
         }
         </style>
     """
