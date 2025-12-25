@@ -30,33 +30,58 @@ if 'theme' not in st.session_state:
 themes = {
     "light": """
         <style>
-        :root, .stApp {
+        :root {
             --primary-color: #4e8cff;
-            --background-color: #ffffff !important;
-            --secondary-background-color: #f0f2f6 !important;
-            --text-color: #262730 !important;
-            --widget-background-color: #ffffff !important;
-            --widget-border-color: #d3d3d3 !important;
+            --background-color: #ffffff;
+            --secondary-background-color: #f0f2f6;
+            --text-color: #262730;
+            --widget-background-color: #ffffff;
+            --widget-border-color: #d3d3d3;
         }
+        /* Force background and text color on the main container and all children */
+        .stApp {
+            background-color: #ffffff !important;
+            color: #262730 !important;
+        }
+        .stApp header, .stApp footer {
+            background-color: #ffffff !important;
+        }
+        /* Metric cards specific styling */
         .metric-card {
             background-color: #f0f2f6 !important;
             border: 1px solid #d3d3d3 !important;
+            color: #262730 !important;
+        }
+        /* Force text color on all headers and text elements */
+        h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+            color: #262730 !important;
         }
         </style>
     """,
     "dark": """
         <style>
-        :root, .stApp {
+        :root {
             --primary-color: #4e8cff;
-            --background-color: #0e1117 !important;
-            --secondary-background-color: #262730 !important;
-            --text-color: #fafafa !important;
-            --widget-background-color: #262730 !important;
-            --widget-border-color: #464b5c !important;
+            --background-color: #0e1117;
+            --secondary-background-color: #262730;
+            --text-color: #fafafa;
+            --widget-background-color: #262730;
+            --widget-border-color: #464b5c;
+        }
+        .stApp {
+            background-color: #0e1117 !important;
+            color: #fafafa !important;
+        }
+        .stApp header, .stApp footer {
+            background-color: #0e1117 !important;
         }
         .metric-card {
             background-color: #262730 !important;
             border: 1px solid #464b5c !important;
+            color: #fafafa !important;
+        }
+         h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+            color: #fafafa !important;
         }
         </style>
     """
@@ -71,8 +96,11 @@ with col_title:
     st.title("Marketing Campaign Performance Analytics")
 with col_toggle:
     # Button to toggle theme
-    if st.button("🌗 Theme"):
-        st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
+    current_theme = st.session_state.theme
+    btn_label = "🌞 Light" if current_theme == 'dark' else "kT Dark"
+    if st.button(btn_label):
+        new_theme = 'light' if current_theme == 'dark' else 'dark'
+        st.session_state.theme = new_theme
         st.rerun()
 
 st.markdown("### Analyzing the impact of email marketing strategies on conversion and spend.")
