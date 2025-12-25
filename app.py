@@ -321,9 +321,16 @@ with tab4:
     results_df = pd.DataFrame(results)
 
     def highlight_significant(val):
+        theme = st.session_state.get('theme', 'light')
         if isinstance(val, float):
-            color = '#d4edda' if val < 0.05 else '#f8d7da' # Green if sig, Red/Pink if not
-            return f'background-color: {color}'
+            if theme == 'dark':
+                # Dark Mode: Dark Green/Red background, White text
+                color = '#1b4d3e' if val < 0.05 else '#4d1b1b' 
+                return f'background-color: {color}; color: #ffffff'
+            else:
+                # Light Mode: Light Green/Red background, Dark text
+                color = '#d4edda' if val < 0.05 else '#f8d7da'
+                return f'background-color: {color}; color: #000000'
         return ''
 
     st.subheader("Test Results")
