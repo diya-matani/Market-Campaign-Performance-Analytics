@@ -251,26 +251,42 @@ with tab3:
 
     # Visualizations
     st.subheader("Visual Comparisons")
+    
+    # Theme-aware styling
+    text_color = "#fafafa" if st.session_state.theme == "dark" else "#262730"
+    
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     fig.patch.set_facecolor('none')
 
     sns.barplot(data=metrics, x="campaign_segment", y="visit_rate", ax=axes[0], palette="viridis")
-    axes[0].set_title("Visit Rate", fontsize=14)
-    axes[0].set_ylabel("Rate")
+    axes[0].set_title("Visit Rate", fontsize=14, color=text_color)
+    axes[0].set_ylabel("Rate", color=text_color)
+    axes[0].set_xlabel("Campaign Segment", color=text_color)
+    axes[0].tick_params(colors=text_color)
     axes[0].grid(axis='y', linestyle='--', alpha=0.5)
     axes[0].set_facecolor('none')
+    for spine in axes[0].spines.values():
+        spine.set_edgecolor(text_color)
 
     sns.barplot(data=metrics, x="campaign_segment", y="conversion_rate", ax=axes[1], palette="coolwarm")
-    axes[1].set_title("Conversion Rate", fontsize=14)
-    axes[1].set_ylabel("Rate")
+    axes[1].set_title("Conversion Rate", fontsize=14, color=text_color)
+    axes[1].set_ylabel("Rate", color=text_color)
+    axes[1].set_xlabel("Campaign Segment", color=text_color)
+    axes[1].tick_params(colors=text_color)
     axes[1].grid(axis='y', linestyle='--', alpha=0.5)
     axes[1].set_facecolor('none')
+    for spine in axes[1].spines.values():
+        spine.set_edgecolor(text_color)
 
     sns.barplot(data=metrics, x="campaign_segment", y="avg_spend", ax=axes[2], palette="magma")
-    axes[2].set_title("Average Spend ($)", fontsize=14)
-    axes[2].set_ylabel("Dollars")
+    axes[2].set_title("Average Spend ($)", fontsize=14, color=text_color)
+    axes[2].set_ylabel("Dollars", color=text_color)
+    axes[2].set_xlabel("Campaign Segment", color=text_color)
+    axes[2].tick_params(colors=text_color)
     axes[2].grid(axis='y', linestyle='--', alpha=0.5)
     axes[2].set_facecolor('none')
+    for spine in axes[2].spines.values():
+        spine.set_edgecolor(text_color)
 
     st.pyplot(fig)
     st.caption("Bar charts showing key performance indicators by campaign segment.")
@@ -366,16 +382,34 @@ with tab5:
             avg_spend=("spend", "mean")
         ).reset_index()
 
+        # Theme-aware styling
+        text_color = "#fafafa" if st.session_state.theme == "dark" else "#262730"
+
         fig2, ax2 = plt.subplots(1, 2, figsize=(14, 5))
         fig2.patch.set_facecolor('none')
         
         sns.barplot(data=segment_metrics, x=segment_col, y="conversion_rate", hue="campaign_segment", ax=ax2[0], palette="cividis")
-        ax2[0].set_title(f"Conversion Rate by {segment_col.replace('_', ' ').title()}")
+        ax2[0].set_title(f"Conversion Rate by {segment_col.replace('_', ' ').title()}", color=text_color)
+        ax2[0].set_xlabel(segment_col.replace('_', ' ').title(), color=text_color)
+        ax2[0].set_ylabel("Conversion Rate", color=text_color)
+        ax2[0].tick_params(colors=text_color)
         ax2[0].set_facecolor('none')
+        for spine in ax2[0].spines.values():
+            spine.set_edgecolor(text_color)
+        # Update legend text color
+        if ax2[0].legend_:
+            plt.setp(ax2[0].legend_.get_texts(), color=text_color)
         
         sns.barplot(data=segment_metrics, x=segment_col, y="avg_spend", hue="campaign_segment", ax=ax2[1], palette="magma")
-        ax2[1].set_title(f"Avg Spend by {segment_col.replace('_', ' ').title()}")
+        ax2[1].set_title(f"Avg Spend by {segment_col.replace('_', ' ').title()}", color=text_color)
+        ax2[1].set_xlabel(segment_col.replace('_', ' ').title(), color=text_color)
+        ax2[1].set_ylabel("Average Spend", color=text_color)
+        ax2[1].tick_params(colors=text_color)
         ax2[1].set_facecolor('none')
+        for spine in ax2[1].spines.values():
+            spine.set_edgecolor(text_color)
+        if ax2[1].legend_:
+            plt.setp(ax2[1].legend_.get_texts(), color=text_color)
         
         st.pyplot(fig2)
 
@@ -392,13 +426,21 @@ with tab6:
             conversion_rate=('conversion', 'mean')
         ).reset_index()
 
+        # Theme-aware styling
+        text_color = "#fafafa" if st.session_state.theme == "dark" else "#262730"
+
         fig3, ax3 = plt.subplots(figsize=(12, 6))
         fig3.patch.set_facecolor('none')
         sns.barplot(data=spend_metrics, x='spend_group', y='conversion_rate', hue='campaign_segment', palette='coolwarm', ax=ax3)
-        ax3.set_title("Conversion Rate by Historical Spend Level", fontsize=15)
-        ax3.set_ylabel("Conversion Rate")
-        ax3.set_xlabel("Customer Value Tier")
+        ax3.set_title("Conversion Rate by Historical Spend Level", fontsize=15, color=text_color)
+        ax3.set_ylabel("Conversion Rate", color=text_color)
+        ax3.set_xlabel("Customer Value Tier", color=text_color)
+        ax3.tick_params(colors=text_color)
         ax3.set_facecolor('none')
+        for spine in ax3.spines.values():
+            spine.set_edgecolor(text_color)
+        if ax3.legend_:
+            plt.setp(ax3.legend_.get_texts(), color=text_color)
         
         st.pyplot(fig3)
         
