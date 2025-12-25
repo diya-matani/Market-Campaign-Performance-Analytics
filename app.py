@@ -12,29 +12,12 @@ st.set_page_config(page_title="Marketing Campaign Performance", layout="wide")
 st.markdown("""
 <style>
     .metric-card {
-        background-color: #f0f2f6;
+        background-color: #262730;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
         text-align: center;
-    }
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 10px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        height: 50px;
-        white-space: pre-wrap;
-        background-color: #ffffff;
-        border-radius: 5px 5px 0 0;
-        gap: 1px;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #e6f3ff;
-        border-bottom: 2px solid #4e8cff;
-        padding-top: 10px;
-        padding-bottom: 10px;
+        border: 1px solid #464b5c;
     }
 </style>
 """, unsafe_allow_html=True)
