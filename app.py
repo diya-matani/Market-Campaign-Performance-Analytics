@@ -22,8 +22,59 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Title and Intro
-st.title("Marketing Campaign Performance Analytics")
+# Initialize theme in session state
+if 'theme' not in st.session_state:
+    st.session_state.theme = 'light'
+
+# Define Theme CSS
+themes = {
+    "light": """
+        <style>
+        :root, .stApp {
+            --primary-color: #4e8cff;
+            --background-color: #ffffff !important;
+            --secondary-background-color: #f0f2f6 !important;
+            --text-color: #262730 !important;
+            --widget-background-color: #ffffff !important;
+            --widget-border-color: #d3d3d3 !important;
+        }
+        .metric-card {
+            background-color: #f0f2f6 !important;
+            border: 1px solid #d3d3d3 !important;
+        }
+        </style>
+    """,
+    "dark": """
+        <style>
+        :root, .stApp {
+            --primary-color: #4e8cff;
+            --background-color: #0e1117 !important;
+            --secondary-background-color: #262730 !important;
+            --text-color: #fafafa !important;
+            --widget-background-color: #262730 !important;
+            --widget-border-color: #464b5c !important;
+        }
+        .metric-card {
+            background-color: #262730 !important;
+            border: 1px solid #464b5c !important;
+        }
+        </style>
+    """
+}
+
+# Apply selected theme
+st.markdown(themes[st.session_state.theme], unsafe_allow_html=True)
+
+# Title and Layout with Toggle
+col_title, col_toggle = st.columns([8, 1])
+with col_title:
+    st.title("Marketing Campaign Performance Analytics")
+with col_toggle:
+    # Button to toggle theme
+    if st.button("🌗 Theme"):
+        st.session_state.theme = 'dark' if st.session_state.theme == 'light' else 'light'
+        st.rerun()
+
 st.markdown("### Analyzing the impact of email marketing strategies on conversion and spend.")
 st.markdown("---")
 
