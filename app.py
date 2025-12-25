@@ -38,8 +38,8 @@ themes = {
             --widget-background-color: #ffffff;
             --widget-border-color: #d3d3d3;
         }
-        /* Force background and text color on the main container and all children */
-        .stApp {
+        /* Force background on main app and SIDEBAR */
+        .stApp, section[data-testid="stSidebar"] {
             background-color: #ffffff !important;
             color: #262730 !important;
         }
@@ -52,9 +52,14 @@ themes = {
             border: 1px solid #d3d3d3 !important;
             color: #262730 !important;
         }
-        /* Force text color on all headers and text elements */
-        h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+        /* Force text color on all headers and text elements, including sidebar */
+        h1, h2, h3, h4, h5, h6, p, li, span, div, label, .stMarkdown {
             color: #262730 !important;
+        }
+        /* Fix input fields in sidebar to look correct in light mode */
+        .stTextInput input, .stSelectbox div, .stFileUploader div {
+            color: #262730 !important;
+            background-color: #ffffff !important;
         }
         </style>
     """,
@@ -68,7 +73,8 @@ themes = {
             --widget-background-color: #262730;
             --widget-border-color: #464b5c;
         }
-        .stApp {
+        /* Force background on main app and SIDEBAR */
+        .stApp, section[data-testid="stSidebar"] {
             background-color: #0e1117 !important;
             color: #fafafa !important;
         }
@@ -80,8 +86,13 @@ themes = {
             border: 1px solid #464b5c !important;
             color: #fafafa !important;
         }
-         h1, h2, h3, h4, h5, h6, p, li, span, div, label {
+         h1, h2, h3, h4, h5, h6, p, li, span, div, label, .stMarkdown {
             color: #fafafa !important;
+        }
+        /* Fix input fields in sidebar to look correct in dark mode */
+        .stTextInput input, .stSelectbox div, .stFileUploader div {
+            color: #fafafa !important;
+            background-color: #262730 !important;
         }
         </style>
     """
@@ -97,7 +108,7 @@ with col_title:
 with col_toggle:
     # Button to toggle theme
     current_theme = st.session_state.theme
-    btn_label = "🌞 Light" if current_theme == 'dark' else "kT Dark"
+    btn_label = "🌞 Light" if current_theme == 'dark' else "🌑 Dark"
     if st.button(btn_label):
         new_theme = 'light' if current_theme == 'dark' else 'dark'
         st.session_state.theme = new_theme
