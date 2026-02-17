@@ -253,7 +253,7 @@ with tab3:
     st.subheader("Visual Comparisons")
     
     # Theme-aware styling
-    text_color = "#fafafa" if st.session_state.theme == "dark" else "#262730"
+    text_color = "#fafafa" if st.session_state.theme == "dark" else "#e1e3f5"
     
     fig, axes = plt.subplots(1, 3, figsize=(18, 6))
     fig.patch.set_facecolor('none')
