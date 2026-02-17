@@ -6,4 +6,4 @@ scipy
 scikit-learn<1.6
 imbalanced-learn>=0.14.0
 ipykernel
-streamlit
+streamlit>=1.42.0
